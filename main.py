@@ -21,7 +21,7 @@ import numpy as np
 from utils import *
 from testModel import *
 from trainModel import *
-from custom_resnet import *
+from SR_resnet import *
 #from utils import progress_bar
 from albumentation_helper import *
 import dataloader
@@ -67,7 +67,8 @@ vis_dataloader = dataloader.getDataLoader(dataset=torchvision.datasets.CIFAR10, 
 
 # Model
 print('==> Building model..')
-net = custom_resnet(0.025)
+#net = custom_resnet(0.025)
+net = SR_resnet(0.025)
 net = net.to(device)
 if device == 'cuda':
     net = torch.nn.DataParallel(net)
@@ -97,7 +98,7 @@ that is what we used to calculate optimal LR
 '''
 ler_rate = 0.0614
 #Let's start with loading the trained model and train again further
-#model_parameters = torch.load('/content/pyTorchModels/custom_resnet.pth')
+
 #load parameters to model
 #net.load_state_dict(model_parameters)
 criterion = nn.CrossEntropyLoss()
