@@ -1,5 +1,5 @@
 !git clone https://github.com/Srinivaskolli45/srinivas.git
-%cd pyTorchModels/
+%cd srinivas/
 !git pull origin
 %cd ..
 !pip install torchsummary
