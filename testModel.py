@@ -27,7 +27,6 @@ def test_model(dataloader,network,lossfn):
 			correct += predicted.eq(targets).sum().item()
 			batches +=1
 
-			#print(batch_idx, len(testloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
-			#             % (test_loss/(batch_idx+1), 100.*correct/total, correct, total))
-	print(len(dataloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
+			
+	print('Test model Loss: %.3f | Acc: %.3f%% (%d/%d)'
 				 % (test_loss/(batches), 100.*correct/total, correct, total))

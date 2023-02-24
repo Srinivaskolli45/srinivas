@@ -25,6 +25,8 @@ from SR_resnet import *
 #from utils import progress_bar
 from albumentation_helper import *
 import dataloader
+
+
 #working on GradCAM 
 from pytorch_grad_cam import GradCAM
 from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
@@ -40,19 +42,16 @@ print('==> Preparing data..')
 
 use_cuda = torch.cuda.is_available()
 
-#kwargs_train = dict(num_workers= 4, pin_memory= True if use_cuda else False,shuffle=True,batch_size=batch_size)
-#kwargs_test = dict(num_workers= 4, pin_memory= True if use_cuda else False,shuffle=False,batch_size=batch_size)
-
-CustomTrainTransform = Alb.Compose([Alb.Normalize(mean=(0.5,0.5,0.5),std=(0.5,0.5,0.5)),
-                                    Alb.PadIfNeeded(min_height=36,min_width=36),
-                                    Alb.RandomCrop(32,32,p=1),
-                                    Alb.HorizontalFlip(p=1),
-                                    Alb.CoarseDropout(max_holes=1,max_height=8,max_width=8,min_holes=1,min_height=8,min_width=8,fill_value=(0.5,0.5,0.5),mask_fill_value=None)])
+CustomTrainTransform = Alb.Compose([Alb.Normalize(mean=(0.49139968, 0.48215841, 0.44653091),std=(0.24703223, 0.24348513, 0.26158784)),
+                                    Alb.PadIfNeeded(min_height=40, min_width=40, border_mode=4, value=None, p=1.0),
+                                    Alb.RandomCrop(32,32),
+                                    Alb.HorizontalFlip(p=0.1),
+                                    Alb.Cutout(8,8,p=0.2)])
  
 transform = Alb_Transforms(CustomTrainTransform)
 TestTransform = transforms.Compose([transforms.ToTensor(),
-                                    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
-visualTransform = transforms.Compose([transforms.ToTensor()])
+                                    transforms.Normalize((0.49139968, 0.48215841, 0.44653091), (0.24703223, 0.24348513, 0.26158784))])
+
 #why we need normalized test data
 #trainset = torchvision.datasets.CIFAR10(root='./data', train=True,
 #                                        download=True, transform=transform)
@@ -66,9 +65,9 @@ classes = ('plane', 'car', 'bird', 'cat',
 vis_dataloader = dataloader.getDataLoader(dataset=torchvision.datasets.CIFAR10, isTrain=True,transform=visualTransform,batchSize=batch_size,isShuffle=True,workers=4,needDownload=True)
 
 # Model
-print('==> Building model..')
-#net = custom_resnet(0.025)
-net = SR_resnet(0.025)
+print(' Building the model..')
+
+net = SR_resnet()
 net = net.to(device)
 if device == 'cuda':
     net = torch.nn.DataParallel(net)
@@ -92,11 +91,8 @@ lr_finder.plot()
 lr_finder.reset()
 
 from torch.optim.lr_scheduler import OneCycleLR
-'''
-With above graph the fine tuned max lr is 0.0614 and as discussed earlier in class min LR 0.00614
-that is what we used to calculate optimal LR
-'''
-ler_rate = 0.0614
+
+ler_rate = 0.04912
 #Let's start with loading the trained model and train again further
 
 #load parameters to model
@@ -108,8 +104,9 @@ optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 epochs = 24
 steps_per_epoch = len(trainloader) 
 total_steps = epochs * len(trainloader)
-#We need to achieve MAX LR in 5th epoch so calculate pct_start. Initial LR is max_lr/10
-#lr has to go from max_lr/10 --> max_lr in 5 epochs that is 5*steps_per_epoch steps 
+
+
+
 pct_start = (5*steps_per_epoch)/total_steps
 print(f'pct_start --> {pct_start}')
 scheduler = OneCycleLR(optimizer,max_lr=ler_rate,
