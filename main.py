@@ -107,7 +107,7 @@ total_steps = epochs * len(trainloader)
 
 
 
-pct_start = (5*steps_per_epoch)/total_steps
+pct_start = (10*steps_per_epoch)/total_steps
 print(f'pct_start --> {pct_start}')
 scheduler = OneCycleLR(optimizer,max_lr=ler_rate,
                        steps_per_epoch=steps_per_epoch,epochs=epochs,
