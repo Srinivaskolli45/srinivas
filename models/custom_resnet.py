@@ -4,9 +4,9 @@ import torch.nn.functional as F
 from torchsummary import summary
 
 #ResNet architecture for CIFAR10
-class SR_resnet(nn.Module):
+class custom_resnet(nn.Module):
   def __init__(self):
-    super(SR_resnet, self).__init__()
+    super(custom_resnet, self).__init__()
 
     self.prepLayer = nn.Sequential(
         nn.Conv2d(in_channels=3, out_channels=64, kernel_size=(3,3), stride=1, padding=1, bias=False),

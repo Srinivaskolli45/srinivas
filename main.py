@@ -21,7 +21,7 @@ import numpy as np
 from utils import *
 from testModel import *
 from trainModel import *
-from SR_resnet import *
+from custom_resnet import *
 #from utils import progress_bar
 from albumentation_helper import *
 import dataloader
@@ -51,7 +51,7 @@ CustomTrainTransform = Alb.Compose([Alb.Normalize(mean=(0.49139968, 0.48215841, 
 transform = Alb_Transforms(CustomTrainTransform)
 TestTransform = transforms.Compose([transforms.ToTensor(),
                                     transforms.Normalize((0.49139968, 0.48215841, 0.44653091), (0.24703223, 0.24348513, 0.26158784))])
-
+visualTransform = transforms.Compose([transforms.ToTensor()])
 #why we need normalized test data
 #trainset = torchvision.datasets.CIFAR10(root='./data', train=True,
 #                                        download=True, transform=transform)
@@ -67,7 +67,7 @@ vis_dataloader = dataloader.getDataLoader(dataset=torchvision.datasets.CIFAR10, 
 # Model
 print(' Building the model..')
 
-net = SR_resnet()
+net = custom_resnet()
 net = net.to(device)
 if device == 'cuda':
     net = torch.nn.DataParallel(net)
